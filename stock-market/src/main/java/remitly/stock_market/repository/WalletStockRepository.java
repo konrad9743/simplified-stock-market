@@ -7,6 +7,6 @@ import java.util.List;
 import java.util.Optional;
 
 public interface WalletStockRepository extends JpaRepository<WalletStock, Long> {
-    List<WalletStock> findByWalletId(String walletId);
-    Optional<WalletStock> findByWalletIdAndStockName(String walletId, String stockName);
+    List<WalletStock> findByWalletId(int walletId);
+    Optional<WalletStock> findByWalletIdAndStockName(int walletId, String stockName);
 }
