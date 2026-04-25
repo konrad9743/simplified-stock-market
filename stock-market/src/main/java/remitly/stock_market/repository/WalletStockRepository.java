@@ -12,6 +12,8 @@ import java.util.Optional;
 public interface WalletStockRepository extends JpaRepository<WalletStock, Long> {
     List<WalletStock> findByWalletId(String walletId);
 
+    List<WalletStock> findByWalletIdAndQuantityGreaterThan(String walletId, int quantity);
+
     @Query("SELECT w.quantity FROM WalletStock w WHERE w.walletId = :walletId AND w.stockName = :stockName")
     Optional<Integer> findQuantityByWalletIdAndStockName(String walletId, String stockName);
 

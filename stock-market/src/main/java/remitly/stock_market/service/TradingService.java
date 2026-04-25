@@ -1,16 +1,15 @@
 package remitly.stock_market.service;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.server.ResponseStatusException;
 import remitly.stock_market.dto.TradeRequest;
 import remitly.stock_market.dto.WalletStockEntry;
+import remitly.stock_market.exception.*;
 import remitly.stock_market.model.entity.AuditLog;
 import remitly.stock_market.model.entity.BankStock;
-import remitly.stock_market.model.enums.OperationType;
 import remitly.stock_market.model.entity.WalletStock;
+import remitly.stock_market.model.enums.OperationType;
 import remitly.stock_market.repository.AuditLogRepository;
 import remitly.stock_market.repository.BankStockRepository;
 import remitly.stock_market.repository.WalletStockRepository;
@@ -25,28 +24,27 @@ public class TradingService {
     private final BankStockRepository bankStockRepository;
     private final AuditLogRepository auditLogRepository;
 
+    @Transactional(readOnly = true)
     public List<WalletStockEntry> getWalletStocks(String walletId) {
-        return walletStockRepository.findByWalletId(walletId).stream()
+        return walletStockRepository.findByWalletIdAndQuantityGreaterThan(walletId, 0).stream()
                 .map(stock -> new WalletStockEntry(stock.getStockName(), stock.getQuantity()))
                 .toList();
     }
 
+    @Transactional(readOnly = true)
     public int getStockQuantity(String walletId, String stockName) {
         return walletStockRepository.findQuantityByWalletIdAndStockName(walletId, stockName)
-                .orElseThrow(() -> new ResponseStatusException(
-                        HttpStatus.NOT_FOUND,
-                        "Couldn't find " + stockName + " in wallet " + walletId
-                ));
+                .orElseThrow(() -> new StockNotFoundException(stockName));
     }
 
     @Transactional
     public void executeTrade(String walletId, String stockName, TradeRequest request) {
         BankStock bankStock = bankStockRepository.findByNameWithLock(stockName)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Stock not found in Bank"));
+                .orElseThrow(() -> new StockNotFoundException(stockName));
 
         if (request.type() == OperationType.BUY) {
             handleBuy(walletId, bankStock);
-        } else if (request.type() == OperationType.SELL) {
+        } else {
             handleSell(walletId, bankStock);
         }
 
@@ -55,11 +53,12 @@ public class TradingService {
 
     private void handleBuy(String walletId, BankStock bankStock) {
         if (bankStock.getQuantity() <= 0) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No stock left in Bank");
+            throw new InsufficientBankStockException(bankStock.getName());
         }
 
         bankStock.setQuantity(bankStock.getQuantity() - 1);
         bankStockRepository.save(bankStock);
+
         WalletStock walletStock = walletStockRepository
                 .findByWalletIdAndStockNameWithLock(walletId, bankStock.getName())
                 .orElse(WalletStock.builder()
@@ -75,14 +74,19 @@ public class TradingService {
     private void handleSell(String walletId, BankStock bankStock) {
         WalletStock walletStock = walletStockRepository
                 .findByWalletIdAndStockNameWithLock(walletId, bankStock.getName())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Stock not owned by wallet"));
+                .orElseThrow(() -> new StockNotOwnedByWalletException(bankStock.getName(), walletId));
 
         if (walletStock.getQuantity() <= 0) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Insufficient stock quantity to sell");
+            throw new InsufficientStockException(bankStock.getName(), walletId);
         }
 
         walletStock.setQuantity(walletStock.getQuantity() - 1);
-        walletStockRepository.save(walletStock);
+
+        if (walletStock.getQuantity() == 0) {
+            walletStockRepository.delete(walletStock);
+        } else {
+            walletStockRepository.save(walletStock);
+        }
 
         bankStock.setQuantity(bankStock.getQuantity() + 1);
         bankStockRepository.save(bankStock);
