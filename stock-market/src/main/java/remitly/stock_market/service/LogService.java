@@ -17,14 +17,8 @@ public class LogService {
     }
 
     public List<AuditLogEntry> getLogHistory() {
-        List<AuditLog> logsFromDb = auditLogRepository.findAllByOrderByCreatedAtAsc();
-
-        return logsFromDb.stream()
-                .map(log -> new AuditLogEntry(
-                        log.getType(),
-                        log.getWalletId(),
-                        log.getStockName()
-                ))
+        return auditLogRepository.findAllByOrderByIdAsc().stream()
+                .map(log -> new AuditLogEntry(log.getType(), log.getWalletId(), log.getStockName()))
                 .toList();
     }
 }
