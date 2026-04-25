@@ -2,6 +2,7 @@ package remitly.stock_market.controller;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import remitly.stock_market.dto.TradeRequest;
 import remitly.stock_market.dto.WalletStateResponse;
 import remitly.stock_market.dto.WalletStockEntry;
 import remitly.stock_market.dto.WalletStockQuantityResponse;
@@ -20,8 +21,13 @@ public class WalletController {
     }
 
     @PostMapping("/{wallet_id}/stocks/{stock_name}")
-    public void BuyOrSell(@PathVariable String wallet_id, @PathVariable String stock_name) {
+    public ResponseEntity<Void> trade(
+            @PathVariable("wallet_id") String walletId,
+            @PathVariable("stock_name") String stockName,
+            @RequestBody TradeRequest request) {
 
+        tradingService.executeTrade(walletId, stockName, request);
+        return ResponseEntity.ok().build();
     }
 
     @GetMapping("/{wallet_id}")

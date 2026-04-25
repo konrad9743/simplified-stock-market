@@ -1,8 +1,10 @@
 package remitly.stock_market.model.enums;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonValue;
 
 public enum OperationType {
-    @JsonProperty("buy") BUY,
-    @JsonProperty("sell") SELL
+    BUY, SELL;
+
+    @JsonValue
+    public String toValue() { return name().toLowerCase(); }
 }
