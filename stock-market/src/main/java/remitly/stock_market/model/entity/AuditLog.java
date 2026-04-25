@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.CreationTimestamp;
 import remitly.stock_market.model.enums.OperationType;
 
 import java.time.Instant;
@@ -26,13 +27,13 @@ public class AuditLog {
 
     private String stockName;
 
-    private Instant createdAt = Instant.now();
+    @CreationTimestamp
+    private Instant createdAt;
 
     public AuditLog(OperationType type, String walletId, String stockName) {
         this.type = type;
         this.walletId = walletId;
         this.stockName = stockName;
-        this.createdAt = Instant.now();
     }
 
 }
