@@ -18,5 +18,5 @@ public class BankStock {
     @Column(unique = true)
     private String name;
 
-    private Integer quantity;
+    private int quantity;
 }

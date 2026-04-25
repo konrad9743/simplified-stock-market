@@ -17,5 +17,5 @@ public class WalletStock {
 
     private String walletId;
     private String stockName;
-    private Integer quantity;
+    private int quantity;
 }
