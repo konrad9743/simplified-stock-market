@@ -1,9 +1,8 @@
 package remitly.stock_market.controller;
 
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import remitly.stock_market.dto.BankStateRequest;
 import remitly.stock_market.dto.BankStateResponse;
 import remitly.stock_market.service.BankService;
 
@@ -20,5 +19,11 @@ public class BankController {
     @GetMapping
     public ResponseEntity<BankStateResponse> getBankState() {
         return ResponseEntity.ok(bankService.getBankState());
+    }
+
+    @PostMapping
+    public ResponseEntity<Void> setBankState(@RequestBody BankStateRequest request) {
+        bankService.setBankState(request);
+        return ResponseEntity.ok().build();
     }
 }

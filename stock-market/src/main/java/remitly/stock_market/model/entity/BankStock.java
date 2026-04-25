@@ -1,17 +1,14 @@
 package remitly.stock_market.model.entity;
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 @Entity
-@Table(uniqueConstraints = {
-        @UniqueConstraint(columnNames = {"walletId", "stockName"})
-})
 @Getter
 @Setter
+@Builder
 @NoArgsConstructor
+@AllArgsConstructor
 public class BankStock {
 
     @Id
@@ -22,9 +19,4 @@ public class BankStock {
     private String name;
 
     private Integer quantity;
-
-    public BankStock(String name, Integer quantity) {
-        this.name = name;
-        this.quantity = quantity;
-    }
 }
