@@ -1,11 +1,10 @@
 package remitly.stock_market.controller;
 
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import remitly.stock_market.dto.AuditLogResponse;
 import remitly.stock_market.dto.WalletStateResponse;
 import remitly.stock_market.dto.WalletStockEntry;
+import remitly.stock_market.dto.WalletStockQuantityResponse;
 import remitly.stock_market.service.TradingService;
 
 import java.util.List;
@@ -26,15 +25,15 @@ public class WalletController {
     }
 
     @GetMapping("/{wallet_id}")
-    public ResponseEntity<WalletStateResponse> returnWalletState(@PathVariable("wallet_id") int walletId) {
+    public ResponseEntity<WalletStateResponse> returnWalletState(@PathVariable("wallet_id") String walletId) {
         List<WalletStockEntry> entries = tradingService.getWalletStocks(walletId);
         return ResponseEntity.ok(new WalletStateResponse(entries));
     }
 
     @GetMapping("/{wallet_id}/stocks/{stock_name}")
-    public void getQuantityOfStock(@PathVariable("wallet_id") String walletId, @PathVariable("stock_name") String stockName) {
+    public ResponseEntity<WalletStockQuantityResponse> getQuantityOfStock(@PathVariable("wallet_id") String walletId,
+                                                                          @PathVariable("stock_name") String stockName) {
+        int quantity = tradingService.getStockQuantity(walletId, stockName);
+        return ResponseEntity.ok(new WalletStockQuantityResponse(quantity));
     }
-
-
-
 }

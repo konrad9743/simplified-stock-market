@@ -1,14 +1,12 @@
 package remitly.stock_market.model.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 @Entity
 @Getter
 @Setter
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class WalletStock {
@@ -17,11 +15,7 @@ public class WalletStock {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private int walletId;
-
+    private String walletId;
     private String stockName;
-
     private Integer quantity;
-
-
 }
