@@ -1,5 +1,6 @@
 package remitly.stock_market.service;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import remitly.stock_market.dto.BankStateRequest;
@@ -12,18 +13,16 @@ import remitly.stock_market.repository.BankStockRepository;
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class BankService {
+
     private final BankStockRepository bankStockRepository;
 
-    public BankService(BankStockRepository bankStockRepository) {
-        this.bankStockRepository = bankStockRepository;
-    }
-
+    @Transactional(readOnly = true)
     public BankStateResponse getBankState() {
         List<StockDto> stocks = bankStockRepository.findAll().stream()
                 .map(s -> new StockDto(s.getName(), s.getQuantity()))
                 .toList();
-
         return new BankStateResponse(stocks);
     }
 
