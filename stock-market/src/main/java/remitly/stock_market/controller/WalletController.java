@@ -5,7 +5,6 @@ import org.springframework.web.bind.annotation.*;
 import remitly.stock_market.dto.TradeRequest;
 import remitly.stock_market.dto.WalletStateResponse;
 import remitly.stock_market.dto.WalletStockEntry;
-import remitly.stock_market.dto.WalletStockQuantityResponse;
 import remitly.stock_market.service.TradingService;
 
 import java.util.List;
@@ -37,9 +36,11 @@ public class WalletController {
     }
 
     @GetMapping("/{wallet_id}/stocks/{stock_name}")
-    public ResponseEntity<WalletStockQuantityResponse> getQuantityOfStock(@PathVariable("wallet_id") String walletId,
-                                                                          @PathVariable("stock_name") String stockName) {
+    public ResponseEntity<Integer> getQuantityOfStock(
+            @PathVariable("wallet_id") String walletId,
+            @PathVariable("stock_name") String stockName) {
+
         int quantity = tradingService.getStockQuantity(walletId, stockName);
-        return ResponseEntity.ok(new WalletStockQuantityResponse(quantity));
+        return ResponseEntity.ok(quantity);
     }
 }
