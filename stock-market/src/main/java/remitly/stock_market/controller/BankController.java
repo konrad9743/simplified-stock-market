@@ -1,5 +1,6 @@
 package remitly.stock_market.controller;
 
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import remitly.stock_market.dto.BankStateRequest;
@@ -22,7 +23,7 @@ public class BankController {
     }
 
     @PostMapping
-    public ResponseEntity<Void> setBankState(@RequestBody BankStateRequest request) {
+    public ResponseEntity<Void> setBankState(@Valid @RequestBody BankStateRequest request) {
         bankService.setBankState(request);
         return ResponseEntity.ok().build();
     }
