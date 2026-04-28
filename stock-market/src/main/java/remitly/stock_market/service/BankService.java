@@ -6,7 +6,6 @@ import org.springframework.transaction.annotation.Transactional;
 import remitly.stock_market.dto.BankStateRequest;
 import remitly.stock_market.dto.BankStateResponse;
 import remitly.stock_market.dto.StockDto;
-import remitly.stock_market.exception.InvalidStockQuantityException;
 import remitly.stock_market.model.entity.BankStock;
 import remitly.stock_market.repository.BankStockRepository;
 
@@ -28,13 +27,8 @@ public class BankService {
 
     @Transactional
     public void setBankState(BankStateRequest request) {
-        request.stocks().forEach(dto -> {
-            if (dto.quantity() == null || dto.quantity() < 0) {
-                throw new InvalidStockQuantityException(dto.name(), dto.quantity() == null ? -1 : dto.quantity());
-            }
-        });
-
         bankStockRepository.deleteAll();
+        bankStockRepository.flush();
 
         List<BankStock> newStocks = request.stocks().stream()
                 .map(dto -> BankStock.builder()
