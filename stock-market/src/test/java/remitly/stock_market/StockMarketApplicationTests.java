@@ -1,13 +1,12 @@
 package remitly.stock_market;
 
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
+import remitly.stock_market.integration.BaseIntegrationTest;
 
-@SpringBootTest
-class StockMarketApplicationTests {
+class StockMarketApplicationTests extends BaseIntegrationTest {
 
 	@Test
 	void contextLoads() {
-	}
 
+	}
 }
