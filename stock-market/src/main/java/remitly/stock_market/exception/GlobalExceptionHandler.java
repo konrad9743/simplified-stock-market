@@ -15,8 +15,17 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ErrorResponse(ex.getMessage()));
     }
 
-    @ExceptionHandler({InsufficientBankStockException.class, StockNotOwnedByWalletException.class, InsufficientStockException.class, InvalidStockQuantityException.class})
+    @ExceptionHandler({InsufficientBankStockException.class, StockNotOwnedByWalletException.class, InsufficientStockException.class})
     public ResponseEntity<ErrorResponse> handleBadRequest(RuntimeException ex) {
         return ResponseEntity.badRequest().body(new ErrorResponse(ex.getMessage()));
+    }
+
+    @ExceptionHandler(org.springframework.web.bind.MethodArgumentNotValidException.class)
+    public ResponseEntity<ErrorResponse> handleValidationExceptions(org.springframework.web.bind.MethodArgumentNotValidException ex) {
+        String errorMessage = ex.getBindingResult().getFieldErrors().stream()
+                .map(error -> error.getField() + ": " + error.getDefaultMessage())
+                .findFirst()
+                .orElse("Validation failed");
+        return ResponseEntity.badRequest().body(new ErrorResponse(errorMessage));
     }
 }
